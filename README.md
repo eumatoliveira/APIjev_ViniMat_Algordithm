@@ -15,7 +15,7 @@
 
 O projeto **APIjev_ViniMat_Algordithm** nasce da sinergia entre pesquisa de dados abertos em saúde corporativa e arquitetura de software de missão crítica:
 
-* **Dev Vinicius Cardi**:  
+* **Dev Vinicius Ciardi**:  
   *Inventor do modelo conceitual a partir de base open source de dados de saúde.*  
   Concepção analítica original, estruturação das premissas de dados públicos em saúde corporativa e exploração inicial de padrões preditivos.
 
