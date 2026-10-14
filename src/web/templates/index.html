@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MATROUTE-AI — Ambiente Web de Testes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --card-hover: #1e293b;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #8b5cf6;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --code-bg: #030712;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-logo {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: #000;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+    }
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .status-bar {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .status-chip {
+      background: #1f2937;
+      border: 1px solid #374151;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+    }
+    .status-dot.offline {
+      background: var(--accent-rose);
+      box-shadow: 0 0 8px var(--accent-rose);
+    }
+    main {
+      flex: 1;
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.5rem;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: #1f2937;
+    }
+    .tab-btn.active {
+      color: #fff;
+      background: var(--accent-blue);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    /* Grid layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.5rem;
+    }
+    @media (max-width: 960px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #1f2937;
+      padding-bottom: 0.75rem;
+    }
+    .presets-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .preset-pill {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .preset-pill:hover {
+      background: var(--accent-blue);
+      color: #fff;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+    .input-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    textarea.query-box {
+      width: 100%;
+      height: 90px;
+      background: #030712;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    textarea.query-box:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+    }
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      border: none;
+      color: #000;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-submit:hover {
+      opacity: 0.9;
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Result card */
+    .result-box {
+      background: #030712;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 200px;
+    }
+    .badge-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .badge-level { background: #1e1b4b; color: #a5b4fc; border: 1px solid #4338ca; }
+    .badge-latency { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
+    .badge-cost { background: #1f2937; color: #fde047; border: 1px solid #4b5563; }
+    .badge-gate { background: #31104b; color: #d8b4fe; border: 1px solid #7e22ce; }
+    
+    .theme-chip {
+      background: #374151;
+      color: #e5e7eb;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .alert-banner {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid var(--accent-rose);
+      color: #fecdd3;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .output-text {
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      flex: 1;
+    }
+    .feedback-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #1f2937;
+      padding-top: 0.75rem;
+    }
+    .feedback-btns {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .btn-feed {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-feed:hover {
+      background: #374151;
+    }
+    
+    /* Stats side card */
+    .stat-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    .stat-val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stat-sub {
+      font-size: 0.75rem;
+      color: var(--accent-emerald);
+      font-weight: 600;
+    }
+
+    /* ASCII Matrix Box */
+    .ascii-box {
+      background: #000;
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.2;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">M</div>
+      <div>
+        <div class="brand-title">MATROUTE-AI</div>
+        <div class="brand-subtitle">IA Seletiva, Econômica & Linguagem como Cálculo</div>
+      </div>
+    </div>
+    <div class="status-bar">
+      <div class="status-chip">
+        <span class="status-dot" id="gemma-dot"></span>
+        <span id="gemma-label">Gemma Local: Verificando...</span>
+      </div>
+      <div class="status-chip">
+        <span class="status-dot"></span>
+        <span>SQLite FTS5</span>
+      </div>
+      <div class="status-chip">
+        <span style="color: var(--accent-cyan); font-weight: 700;">Limiar &tau;: <span id="tau-val">0.500</span></span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('playground')">⚡ Playground de Roteamento</button>
+      <button class="tab-btn" onclick="switchTab('finops')">📊 Painel FinOps</button>
+      <button class="tab-btn" onclick="switchTab('calc')">🧮 Cálculo & Entropia Shannon</button>
+    </div>
+
+    <!-- TAB 1: PLAYGROUND -->
+    <div id="tab-playground" class="tab-content active">
+      <div class="dashboard-grid">
+        
+        <!-- Left: Input & Response -->
+        <div class="card">
+          <div class="card-title">
+            <span>Laboratório de Teste Interativo</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">Pressione Ctrl+Enter para enviar</span>
+          </div>
+
+          <!-- Presets -->
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 600;">PRESETS DE TESTE RÁPIDO:</div>
+            <div class="presets-container">
+              <button class="preset-pill" onclick="setQuery('Olá, tudo bem?')">👋 Saudação L0</button>
+              <button class="preset-pill" onclick="setQuery('Meu supervisor me humilhou e me ameaçou de demissão!')">🚨 Proteção / Assédio</button>
+              <button class="preset-pill" onclick="setQuery('Estou sobrecarregado com volume de trabalho e metas abusivas')">⚖️ Sobrecarga Plura (14 Temas)</button>
+              <button class="preset-pill" onclick="setQuery('Como faco para redefinir minha senha?')">🔑 Reset Senha (FAQ)</button>
+              <button class="preset-pill" onclick="setQuery('Analise este contrato e avalie riscos juridicos e clausulas de rescisao.')">📑 Contrato (L4 Escalonado)</button>
+              <button class="preset-pill" onclick="setQuery('Explique de forma clara como funciona a matriz de convolucao Sobel para imagens.', true)">🤖 Gemma Local (Sobel)</button>
+            </div>
+          </div>
+
+          <!-- Input -->
+          <div class="input-wrapper">
+            <textarea id="query-input" class="query-box" placeholder="Digite uma pergunta, relato ou consulta corporativa..."></textarea>
+            <div class="controls-row">
+              <label class="checkbox-label">
+                <input type="checkbox" id="force-gemma-toggle">
+                <span>Forçar Gemma Local On-Device (127.0.0.1:13305)</span>
+              </label>
+              <button class="btn-submit" id="btn-send" onclick="sendQuery()">
+                <span id="btn-label">Enviar Requisição</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Result Area -->
+          <div class="result-box">
+            <div class="badge-bar" id="badge-bar">
+              <span class="badge badge-level" id="res-level">Nível: AGUARDANDO</span>
+              <span class="badge badge-latency" id="res-lat">Latência: -- ms</span>
+              <span class="badge badge-cost" id="res-cost">Custo: US$ 0.000000</span>
+              <span class="badge badge-gate" id="res-gate">Gate S: --</span>
+              <div id="theme-tags" style="display: flex; gap: 0.35rem; flex-wrap: wrap;"></div>
+            </div>
+
+            <div class="alert-banner" id="pgr-alert-banner">
+              ⚠️ <strong>ALERTA DE SEGURANÇA E PROTOCOLO CONFIDENCIAL PGR ATIVADO</strong>: Orientação e canais de apoio (CVV 188 / SAMU / Ética) emitidos automaticamente.
+            </div>
+
+            <div class="output-text" id="res-text">Digite um texto acima ou clique em um dos presets de teste para avaliar o pipeline seletivo em tempo real.</div>
+
+            <div class="feedback-row">
+              <span style="font-size: 0.75rem; color: var(--text-muted);" id="req-id-label">ID: req_idle</span>
+              <div class="feedback-btns">
+                <button class="btn-feed" onclick="sendFeedback(true)">👍 Joia (+1)</button>
+                <button class="btn-feed" onclick="sendFeedback(false)">👎 Deslike (-1)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Telemetry Mini-Panel -->
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="stat-card">
+            <div class="stat-label">Decisão Econômica</div>
+            <div class="stat-val" id="stat-economy-pct">99.8%</div>
+            <div class="stat-sub">Economia gerada vs. Naive LLM</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Latência L0 Determinística</div>
+            <div class="stat-val" id="stat-latency-l0">&lt; 1 ms</div>
+            <div class="stat-sub">Sub-milissegundo sem LLM</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Taxa Resolvida Localmente</div>
+            <div class="stat-val" id="stat-local-pct">92.0%</div>
+            <div class="stat-sub">L0 Rules + FTS5 + JEV</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Modelo Gemma Local</div>
+            <div class="stat-val" style="font-size: 1.1rem; color: var(--accent-cyan);">Gemma-4-E2B</div>
+            <div class="stat-sub">100% Gratuito / On-Device</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: FINOPS -->
+    <div id="tab-finops" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>Painel Executivo de Telemetria e FinOps</span>
+          <button class="btn-feed" onclick="loadFinOps()">🔄 Atualizar Métricas</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+          <div class="stat-card">
+            <div class="stat-label">Total Requisições Auditadas</div>
+            <div class="stat-val" id="fin-total">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Custo Cenário Otimizado</div>
+            <div class="stat-val" style="color: var(--accent-emerald);" id="fin-opt-cost">US$ 0.0000</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Custo Cenário Ingênuo (100% IA)</div>
+            <div class="stat-val" style="color: var(--accent-rose);" id="fin-naive-cost">US$ 0.0000</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Economia Gerada</div>
+            <div class="stat-val" id="fin-savings">US$ 0.0000</div>
+            <div class="stat-sub" id="fin-savings-pct">0.0% poupados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Latência Média / P95</div>
+            <div class="stat-val" style="font-size: 1.25rem;" id="fin-latencies">0 ms / 0 ms</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Índice J de Otimização</div>
+            <div class="stat-val" style="color: var(--accent-purple);" id="fin-j-index">0.000</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: CALCULO & SHANNON -->
+    <div id="tab-calc" class="tab-content">
+      <div class="card">
+        <div class="card-title">
+          <span>Calculadora Semântica Determinística & Entropia de Shannon</span>
+        </div>
+        <div class="input-wrapper">
+          <textarea id="calc-input" class="query-box" placeholder="Digite uma frase ou documento para calcular a matemática determinística...">LINGUAGEM COMO CALCULO DETERMINISTICO</textarea>
+          <button class="btn-submit" onclick="computeMath()" style="align-self: flex-start;">Calcular Métricas Matemáticas</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem;">
+          <div class="stat-card">
+            <div class="stat-label">Entropia H(X) (Bits / Char)</div>
+            <div class="stat-val" id="math-char-ent">0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Entropia de Palavras H(W)</div>
+            <div class="stat-val" id="math-word-ent">0.00</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Razão de Compressão Teórica</div>
+            <div class="stat-val" id="math-comp">0.0x</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Entropia Normalizada</div>
+            <div class="stat-val" id="math-red">0.00</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem;">Grade de Densidade Matricial 2D (ASCII Folding):</div>
+          <div class="ascii-box" id="math-ascii-grid">Aguardando cálculo...</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let currentRequestId = null;
+    let currentRoute = 'LEVEL_0_LOCAL';
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+      if (tabId === 'finops') loadFinOps();
+    }
+
+    async function checkStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        const dot = document.getElementById('gemma-dot');
+        const label = document.getElementById('gemma-label');
+        if (data.gemma_server.online) {
+          dot.classList.remove('offline');
+          label.innerText = 'Gemma Local: ONLINE (127.0.0.1:13305)';
+        } else {
+          dot.classList.add('offline');
+          label.innerText = 'Gemma Local: OFFLINE';
+        }
+        document.getElementById('tau-val').innerText = data.tau.toFixed(3);
+      } catch (e) {
+        console.error('Falha ao checar status:', e);
+      }
+    }
+
+    function setQuery(text, forceGemma = false) {
+      document.getElementById('query-input').value = text;
+      document.getElementById('force-gemma-toggle').checked = forceGemma;
+      sendQuery();
+    }
+
+    async function sendQuery() {
+      const input = document.getElementById('query-input');
+      const query = input.value.trim();
+      if (!query) return;
+
+      const forceGemma = document.getElementById('force-gemma-toggle').checked;
+      const btn = document.getElementById('btn-send');
+      const btnLabel = document.getElementById('btn-label');
+      btn.disabled = true;
+      btnLabel.innerText = forceGemma ? 'Aguardando Gemma Local...' : 'Roteando...';
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, force_gemma: forceGemma })
+        });
+        const data = await res.json();
+        currentRequestId = data.request_id;
+        currentRoute = data.level;
+
+        // Update badges
+        document.getElementById('res-level').innerText = 'Nível: ' + data.level;
+        document.getElementById('res-lat').innerText = 'Latência: ' + data.latency_ms + ' ms';
+        document.getElementById('res-cost').innerText = 'Custo: US$ ' + Number(data.cost_usd).toFixed(6);
+        document.getElementById('res-gate').innerText = 'Gate S: ' + (data.gate_score !== undefined ? data.gate_score : '--');
+        document.getElementById('req-id-label').innerText = 'ID: ' + data.request_id;
+        
+        // Themes
+        const themeContainer = document.getElementById('theme-tags');
+        themeContainer.innerHTML = '';
+        if (data.themes && data.themes.length > 0) {
+          data.themes.forEach(t => {
+            const span = document.createElement('span');
+            span.className = 'theme-chip';
+            span.innerText = '#' + t;
+            themeContainer.appendChild(span);
+          });
+        }
+
+        // PGR Alert Banner
+        const alertBanner = document.getElementById('pgr-alert-banner');
+        if (data.pgr_alert) {
+          alertBanner.style.display = 'block';
+        } else {
+          alertBanner.style.display = 'none';
+        }
+
+        // Response text
+        document.getElementById('res-text').innerText = data.text;
+      } catch (err) {
+        document.getElementById('res-text').innerText = '[Erro]: Não foi possível processar a requisição: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btnLabel.innerText = 'Enviar Requisição';
+      }
+    }
+
+    async function sendFeedback(thumbsUp) {
+      if (!currentRequestId) {
+        alert('Nenhuma requisição recente para avaliar.');
+        return;
+      }
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            request_id: currentRequestId,
+            thumbs_up: thumbsUp,
+            route: currentRoute
+          })
+        });
+        const data = await res.json();
+        document.getElementById('tau-val').innerText = data.new_tau.toFixed(3);
+        alert(thumbsUp ? '👍 Avaliação positiva registrada! Limiar Tau recalibrado.' : '👎 Deslike registrado! Limiar Tau ajustado.');
+      } catch (e) {
+        console.error('Falha no feedback:', e);
+      }
+    }
+
+    async function loadFinOps() {
+      try {
+        const res = await fetch('/api/finops');
+        const d = await res.json();
+        document.getElementById('fin-total').innerText = d.total_requests;
+        document.getElementById('fin-opt-cost').innerText = 'US$ ' + d.optimized_cost_usd.toFixed(4);
+        document.getElementById('fin-naive-cost').innerText = 'US$ ' + d.naive_cost_usd.toFixed(4);
+        document.getElementById('fin-savings').innerText = 'US$ ' + d.savings_usd.toFixed(4);
+        document.getElementById('fin-savings-pct').innerText = d.savings_pct + '% poupados';
+        document.getElementById('fin-latencies').innerText = d.mean_latency_ms + ' ms / ' + d.p95_latency_ms + ' ms';
+        document.getElementById('fin-j-index').innerText = d.j_optimization_index;
+
+        // Quick mini-stats
+        document.getElementById('stat-economy-pct').innerText = d.savings_pct + '%';
+        document.getElementById('stat-local-pct').innerText = d.local_resolved_pct + '%';
+      } catch (e) {
+        console.error('Falha ao carregar FinOps:', e);
+      }
+    }
+
+    async function computeMath() {
+      const text = document.getElementById('calc-input').value.trim();
+      if (!text) return;
+      try {
+        const res = await fetch('/api/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const d = await res.json();
+        document.getElementById('math-char-ent').innerText = d.entropy.char_entropy_bits;
+        document.getElementById('math-word-ent').innerText = d.entropy.word_entropy_bits;
+        document.getElementById('math-comp').innerText = d.entropy.compressibility_ratio + 'x';
+        document.getElementById('math-red').innerText = d.entropy.normalized_entropy;
+        document.getElementById('math-ascii-grid').innerText = d.ascii_density_grid;
+      } catch (e) {
+        console.error('Falha no cálculo matemático:', e);
+      }
+    }
+
+    // Ctrl+Enter to send query
+    document.getElementById('query-input').addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        sendQuery();
+      }
+    });
+
+    // Check status on load
+    checkStatus();
+    loadFinOps();
+    setInterval(checkStatus, 15000);
+  </script>
+</body>
+</html>
