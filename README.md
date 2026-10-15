@@ -25,7 +25,6 @@ O projeto **APIjev_ViniMat_Algordithm** nasce da sinergia entre pesquisa de dado
   - Arquitetura de IA Seletiva e Econômica (Prompt Mestre L0 a L5).
   - Semântica determinística de **Linguagem como Cálculo** (Álgebra de tensores ASCII, Entropia de Shannon, Cadeias Estocásticas de Markov e Convolução Espacial Sobel $3 \times 3$).
   - Motor **JEV (TypeSafe AI — System One Models)** para inferência tipada não-autoregressiva com aprendizado online por reforço ($\tau$).
-  - Camada de **Proteção Vital PluraTalks (Passo 0)** com classificação de 14 temas corporativos e detecção determinística de 3 sinais críticos com encaminhamento imediato (CVV 188, SAMU 192 e Canais de Ética).
   - Orquestração híbrida on-device para o modelo **Gemma-4-E2B** via Lemonade Server (`127.0.0.1:13305`).
   - Painel Executivo FinOps e Ambiente Web Interativo em FastAPI.
 
